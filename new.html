@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study & Design Item Tracker</title>
+  <style>
+    /* Same styles as before */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-image: url('file:///C:/Users/ayush/Downloads/360_F_554468927_iwU3VYIjsaeopAb0WPYxVf21TloEhTEj.jpg'); /* Local file path */
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
+      transition: background-color 0.3s ease;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+      width: 80%;
+      max-width: 900px;
+      transition: background-color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+      transition: transform 0.3s ease;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: box-shadow 0.3s ease;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    tr:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.02);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    td button {
+      padding: 8px 12px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    td button:hover {
+      background-color: #0056b3;
+      transform: scale(1.1);
+    }
+
+    #new-item-form {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    #new-item-form input {
+      padding: 12px;
+      width: 80%;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 1em;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: box-shadow 0.3s ease;
+    }
+
+    #new-item-form input:focus {
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+
+    #new-item-form button {
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #new-item-form button:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    #qr-code-container {
+      text-align: center;
+      margin-top: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      transition: box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Study & Design Item Tracker</h1>
+
+    <div id="new-item-form">
+      <input type="text" id="new-item" placeholder="Enter item name (e.g., Pens)">
+      <button onclick="addItem()">Add Item</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="items-list">
+        <!-- Items will be dynamically inserted here -->
+      </tbody>
+    </table>
+
+    <div id="qr-code-container"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <script>
+    let items = [
+      { name: "Pens", quantity: 10 },
+      { name: "Pencils", quantity: 8 },
+      { name: "Erasers", quantity: 5 },
+      { name: "Markers", quantity: 6 },
+      { name: "Sticky Notes", quantity: 12 },
+      { name: "Chargers", quantity: 2 },
+    ];
+
+    function renderTable() {
+      const itemsList = document.getElementById("items-list");
+      itemsList.innerHTML = "";
+      items.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.quantity}</td>
+          <td>
+            <button onclick="updateQuantity(${index}, 1)">+</button>
+            <button onclick="updateQuantity(${index}, -1)">-</button>
+          </td>`;
+        itemsList.appendChild(row);
+      });
+    }
+
+    function addItem() {
+      const itemName = document.getElementById("new-item").value.trim();
+      if (itemName) {
+        items.push({ name: itemName, quantity: 0 });
+        document.getElementById("new-item").value = "";
+        renderTable();
+      } else {
+        alert("Please enter a valid item name.");
+      }
+    }
+
+    function updateQuantity(index, delta) {
+      items[index].quantity += delta;
+      if (items[index].quantity < 0) items[index].quantity = 0;
+      renderTable();
+    }
+
+    function generateQRCode() {
+      const currentUrl = window.location.href;
+      QRCode.toCanvas(document.getElementById("qr-code-container"), currentUrl, function (error) {
+        if (error) console.error(error);
+      });
+    }
+
+    renderTable();
+    generateQRCode();
+  </script>
+
+</body>
+</html>
